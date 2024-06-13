@@ -24,7 +24,7 @@ function main() {
         local -i commit=$(git rev-list --count master)
         git add .
         git commit --message "commit $(( commit + 1 ))"
-        git push origin --quiet &> /dev/null
+        git push --quiet origin master &> /dev/null
     fi
     cd "$OLDPWD"
 }
