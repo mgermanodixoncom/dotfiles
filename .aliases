@@ -83,6 +83,7 @@ function alias:sudo() {
 # If RELOAD_COMMAND is given, the generated script and/or generated alias will run RELOAD_COMMAND after the user finishes editing the file and the file has changed.
 #
 # If RELOAD_MESSAGE is given, RELOAD_MESSAGE will be printed to stdout before RELOAD_COMMAND.
+# If RELOAD_MESSAGE is the special value "!ignore", then no message will be printed.
 # Otherwise, RELOAD_MESSAGE will be "Reloading PROGRAM..."
 function alias:configuration() {
 	local program=$1; shift
@@ -136,7 +137,16 @@ function alias:configuration() {
 			$reload_command
 		fi
 		EOF
-	else
+	elif [[ $reload_message == '!ignore' ]]; then
+        cat <<- EOF >> "$alias_script_path"
+		local begin_hash=\$(sha1sum \$file)
+		$editor \$file
+		local end_hash=\$(sha1sum \$file)
+		if [[ \$begin_hash != \$end_hash ]]; then
+			$reload_command
+		fi
+		EOF
+    else
 		cat <<- EOF >> "$alias_script_path"
 		local begin_hash=\$(sha1sum \$file)
 		$editor \$file
@@ -308,15 +318,15 @@ function aliases:networking() {
 
 	if which sshd &> /dev/null; then
 		alias:sudo ssh:reload='systemctl reload sshd'
-		alias:configuration ssh:daemon /etc/ssh/sshd_config "sudo systemctl reload sshd" "Reloading Secure SHell Daemon..."
+		alias:configuration ssh:daemon /etc/ssh/sshd_config 'sudo systemctl reload sshd' 'Reloading Secure SHell Daemon...'
 		alias:configuration ssh:client "$HOME/.ssh/config"
 	fi
 
 	if which httpd &> /dev/null; then
 		alias bcrypt="htpasswd -bnB "
 		alias:sudo apache:reload='systemctl reload httpd'
-		alias:configuration apache /etc/httpd/conf/httpd.conf "sudo systemctl reload httpd" "Reloading Apache..."
-		alias:configuration apache:vhosts /etc/httpd/conf/extra/vhosts "sudo systemctl reload httpd" "Reloading Apache..."
+		alias:configuration apache /etc/httpd/conf/httpd.conf 'sudo systemctl reload httpd' 'Reloading Apache...'
+		alias:configuration apache:vhosts /etc/httpd/conf/extra/vhosts 'sudo systemctl reload httpd' 'Reloading Apache...'
 	fi
 }; aliases:networking
 
@@ -332,13 +342,13 @@ function aliases:system() {
 		alias:sudo grub:install="grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB"
 		alias:sudo grub:reconfigure="grub-mkconfig -o /boot/grub/grub.cfg"
 		alias:sudo grub:reload="sudo grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB && sudo grub-mkconfig -o /boot/grub/grub.cfg"
-		alias:configuration grub /etc/default/grub "sudo grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB && sudo grub-mkconfig -o /boot/grub/grub.cfg" "Reinstalling and reconfiguring GRUB..."
-		alias:configuration grub:entries /etc/grub.d "sudo grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB && sudo grub-mkconfig -o /boot/grub/grub.cfg" "Reinstalling and reconfiguring GRUB..."
+		alias:configuration grub /etc/default/grub "sudo grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB && sudo grub-mkconfig -o /boot/grub/grub.cfg" 'Reinstalling and reconfiguring GRUB...'
+		alias:configuration grub:entries /etc/grub.d "sudo grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB && sudo grub-mkconfig -o /boot/grub/grub.cfg" 'Reinstalling and reconfiguring GRUB...'
 	fi
 
 	if which mkinitcpio &> /dev/null; then
-		alias:sudo initramfs:reconfigure="mkinitcpio -P"
-		alias:configuration initramfs /etc/mkinitcpio.conf "sudo mkinitcpio -P" "Regenerating initramfs..."
+		alias:sudo initramfs:reconfigure='mkinitcpio -P'
+		alias:configuration initramfs /etc/mkinitcpio.conf 'sudo mkinitcpio -P' 'Regenerating initramfs...'
 	fi
 }; aliases:system
 
@@ -352,16 +362,16 @@ function aliases:shell() {
 	local reload
 	if ! shopt -q login_shell; then
 		reload="source $HOME/.bashrc"
-		alias:configuration shell:interactive "$HOME/.bashrc" "$reload" "Reloading shell..."
-		alias:configuration shell:login "$HOME/.profile"
+		alias:configuration shell:interactive "$HOME/.bashrc" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
+		alias:configuration shell:login "$HOME/.profile" "$DOTFILES/commit.sh -a" '!ignore'
 	else
 		reload="source $HOME/.bashrc"
-		alias:configuration shell:interactive "$HOME/.bashrc"
-		alias:configuration shell:login "$HOME/.profile" "$reload" "Reloading shell..."
+		alias:configuration shell:interactive "$HOME/.bashrc" "$DOTFILES/commit.sh -a" '!ignore'
+		alias:configuration shell:login "$HOME/.profile" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
 	fi
-	alias reload="$reload"
+	alias shell:reload="$reload"
 
-	alias:configuration shell "$HOME/.bash" "$reload" "Reloading shell..."
-	alias:configuration shell:integrations "$HOME/.integrations" "$reload" "Reloading shell..."
-	alias:configuration shell:aliases "$HOME/.aliases" "$reload" "Reloading shell..."
+	alias:configuration shell "$HOME/.shell" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:integrations "$HOME/.integrations" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:aliases "$HOME/.aliases" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
 }; aliases:shell
