@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+##
+## Options
+##
+
+shopt -s extglob
+
+##
+## Editor
+##
+
+export EDITOR=nano
+export SUDO_EDITOR=rnano
+if [[ $SORUCODER_SESSION =~ ^plasma ]]; then
+    export VISUAL='code -w'
+fi
+
+##
+## Prompt
+##
+
+export PS1="\u@\h:\W\$ "
+
+##
+## Integrations
+##
+
+source "$HOME/.integrations"
+
+##
+## Aliases
+##
+
+source "$HOME/.aliases"

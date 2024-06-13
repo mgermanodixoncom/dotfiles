@@ -1,0 +1,7 @@
+[user]
+	email = sorucoder+github@proton.me
+	name  = sorucoder
+[protocol "file"]
+	allow = always
+[push]
+	autoSetupRemote = true
