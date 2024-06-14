@@ -9,10 +9,10 @@ function main() {
             read -rn1 response
             case $response in
             y|Y)
-                printf 'Commiting changes...\n'
+                printf '\nCommitting changes...\n'
                 ;;
             *)
-                if [[ -z $response ]]; then
+                if [[ -n $response ]]; then
                     printf '\n'
                 fi
                 return 0
@@ -21,10 +21,10 @@ function main() {
             shift
         fi
         
-        local -i commit=$(git rev-list --count master)
+        local -i commit=$(git rev-list --count HEAD)
         git add .
-        git commit --message "commit $(( commit + 1 ))"
-        git push --quiet origin master &> /dev/null
+        git commit --quiet --message "commit $(( commit + 1 ))"
+        git push --quiet
     fi
     cd "$OLDPWD"
 }

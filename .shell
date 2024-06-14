@@ -12,9 +12,6 @@ shopt -s extglob
 
 export EDITOR=nano
 export SUDO_EDITOR=rnano
-if [[ $SORUCODER_SESSION =~ ^plasma ]]; then
-    export VISUAL='code -w'
-fi
 
 ##
 ## Prompt

@@ -2,8 +2,24 @@
 
 # TODO: Upon finishing M.I.C.H.A.L., use $SORUCODER_CONFIGURATION instead of relying on $HOSTNAME
 function main() {
-	if [[ $HOSTNAME != sorucoder-server && -z $SSH_CLIENT ]]; then
+	if [[ -z $SSH_CLIENT && -z $SUDO_USER ]]; then
 		while [[ -z $SORUCODER_SESSION ]]; do
+            local default_selection
+            case $SORUCODER_DEFAULT_SESSION in
+            plasma-x11)
+                default_selection=1
+                ;;
+            plasma-wayland)
+                default_selection=2
+                ;;
+            none)
+                default_selection=3
+                ;;
+            *)
+                default_selection='<not set>'
+                ;;
+            esac
+
 			printf 'Available Desktop Sessions:\n'
 			printf '\t1. KDE Plasma Desktop under X11\n'
 			printf '\t2. KDE Plasma Desktop under Wayland\n'
@@ -14,27 +30,17 @@ function main() {
 			printf '\tb. Toggle SSH Password Authentication\n\n'
 
 			local selection
-			printf "Please enter your selection (default %s): " "${SORUCODER_DEFAULT_SESSION:-not set}"
+			printf "Please enter your selection (default %s): " "$default_selection"
 			read -rn1 selection
 			if [[ -z $selection ]]; then
-				printf '\n'
-				if [[ -z $SORUCODER_DEFAULT_SESSION ]]; then
-					printf 'No default entry. Please enter a valid selection.\n'
-					continue
-				fi
-				case $SORUCODER_DEFAULT_SESSION in
-				plasma-x11)
-					selection=1
-					;;
-				plasma-wayland)
-					selection=2
-					;;
-				*)
-					selection=3
-					;;
-				esac
-			fi
-
+                if [[ $default_selection == '<not set>' ]]; then
+                    printf 'Default session is not configured. Please enter a valid entry.\n'
+                    continue
+                fi
+                selection="$default_selection"
+            else
+                printf '\n'
+            fi
 			case $selection in
 			1)
 				export SORUCODER_SESSION=plasma-x11
@@ -46,14 +52,17 @@ function main() {
 				;;
 			3)
 				export SORUCODER_SESSION=none
-				printf '\n'
 				;;
 			a)
 				printf 'Fixing Broken Wayland Session...\n'
 
 				loginctl unlock-session 1
 				
-				chvt 1
+				local current_tty_file=$(tty)
+                if [[ $current_tty_file =~ ^/dev/tty ]]; then
+                    local -i current_tty="${current_tty_file##/dev/tty}"
+                    chvt $(( current_tty > 1 ? current_tty - 1 : 1 ))
+                fi
 				
 				logout
 				;;
@@ -76,7 +85,7 @@ function main() {
 					}
 				}
 				EOF
-				)" /tmp/sshd_config | sudo tee /etc/sshd_config > /dev/null
+				)" /tmp/sshd_config | sudo tee /etc/ssh/sshd_config > /dev/null
 				rm /tmp/sshd_config
 
 				sudo systemctl reload sshd

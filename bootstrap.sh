@@ -3,7 +3,7 @@
 function main() {
 	if [[ $(nmcli --colors no networking connectivity) == 'full' ]]; then
         cd "$HOME/.dotfiles/"
-		git pull --quiet origin master &> /dev/null
+		git pull --quiet
         cd "$OLDPWD"
 	fi
 
