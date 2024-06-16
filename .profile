@@ -20,4 +20,4 @@ source "$HOME/.dotfiles/bootstrap.sh"
 ## Common Configuration
 ##
 
-source "$HOME/.bash"
+source "$HOME/.shell"
