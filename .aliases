@@ -410,12 +410,17 @@ function aliases:networking() {
 }; aliases:networking
 
 function aliases:system() {
-	alias pkgmgr=paru
 	alias:sudo pacman
 	alias:sudo systemctl
 	alias:sudo 'shutdown=systemctl poweroff'
 	alias:sudo 'reboot=systemctl reboot'
 	alias:configuration pacman=/etc/pacman.conf
+
+	if which paru &> /dev/null; then
+		alias packages=paru
+	else
+		alias:sudo packages=pacman
+	fi
 	
 	if which grub-install &> /dev/null && which grub-mkconfig &> /dev/null; then
 		local grub_install_command="grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB"
