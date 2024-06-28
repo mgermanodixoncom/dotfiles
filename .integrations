@@ -2,6 +2,7 @@
 
 export DOTFILES="$HOME/.dotfiles"
 export DOTFILES_ALIASES="$DOTFILES/aliases"
+export DOTFILES_TEMPDIR=/tmp/dotfiles
 
 if which powerline-daemon &> /dev/null && [[ $TERM == xterm-256color ]]; then
 	function integrate:powerline() {
