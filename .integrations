@@ -1,44 +1,52 @@
 #!/usr/bin/env bash
 
-# Dotfiles integration
 export DOTFILES="$HOME/.dotfiles"
 export DOTFILES_ALIASES="$DOTFILES/aliases"
 
-# Powerline integration
 if which powerline-daemon &> /dev/null && [[ $TERM == xterm-256color ]]; then
-    powerline-daemon -q
-    export POWERLINE_BASH_CONTINUATION=1
-    export POWERLINE_BASH_SELECT=1
-    source /usr/share/powerline/bindings/bash/powerline.sh
+	function integrate:powerline() {
+	    powerline-daemon -q
+	    export POWERLINE_BASH_CONTINUATION=1
+	    export POWERLINE_BASH_SELECT=1
+	    source /usr/share/powerline/bindings/bash/powerline.sh
+	}; integrate:powerline
 fi
 
-# direnv Integration
 if which direnv &> /dev/null; then
-	eval "$(direnv hook bash)"
+	function integrate:direnv() {
+		eval "$(direnv hook bash)"
+	}; integrate:direnv
 fi
 
-# Go integration
 if which go &> /dev/null; then
     export PATH="$PATH:$GOPATH/bin"
     export GOPATH="$HOME/Programming/Go"
 fi
 
-# Composer integration
 if which composer &> /dev/null; then
-	export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+	function integrate:composer() {
+		export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+	}
 fi
 
-# CEdev integration
-if [[ -d /opt/CEdev ]]; then
-	export PATH="$PATH:/opt/CEdev/bin"
+export TI84PLUSCETOOLCHAIN=/opt/CEdev
+if [[ -d $TI84PLUSCETOOLCHAIN ]]; then
+	export PATH="$PATH:$TI84PLUSCETOOLCHAIN/bin"
 fi
 
-# Wine integration
 if which wine &> /dev/null; then
-    export WINEDLLOVERRIDES='winemenubuilder.exe=d'
+	export WINEARCH=win32
+
+	function integrate:wine() {
+	    export WINEDLLOVERRIDES='winemenubuilder.exe=d'
+	    if [[ -z $WINEARCH || $WINEARCH == win64 ]]; then
+	    	export WINEPREFIX="$HOME/.wine/win64"
+	    elif [[ $WINEARCH == win32 ]]; then
+	    	export WINEPREFIX="$HOME/.wine/win32"
+	    fi
+	}; integrate:wine
 fi
 
-# TIC-80 integration
 if which tic80 &> /dev/null; then
 	export TIC80_START_PATH="$HOME/Programming/TIC-80"
 fi
