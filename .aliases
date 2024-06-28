@@ -137,8 +137,8 @@ function alias:configuration() {
 				printf ' %s' "$reload_message"
 			fi
 			printf '\n'
-			
-			if [[ -d $path ]]; then 
+
+			if [[ -d $path ]]; then
 				cat <<- EOF
 				if [[ -z \$1 || \$1 == -h || \$1 == --help ]]; then
 				    printf 'Usage:\n' > /dev/stderr
@@ -199,11 +199,11 @@ function alias:configuration() {
 function aliases:user() {
 	alias user:id=id
 	alias 'user:impersonate=sudo -iu'
-	alias:sudo $'user:list=awk -F: \'{ printf "%s ", $1; } END { print; }\' /etc/passwd'
+	alias:sudo user:list=$'awk -F: \'NR == 1 { printf "%s", $1; } NR > 1 { printf " %s", $1; } END { printf "\\n"; }\' /etc/passwd'
 	alias:sudo user:create=useradd
 	alias:sudo user:password=passwd
 	alias:sudo user:delete=userdel
-	alias:sudo 'user:expire=chage -d 0'
+	alias:sudo user:expire='chage -d 0'
 	alias:sudo user:info=chfn
 
 	if [[ ! -p /tmp/aliases_user_code ]]; then
@@ -222,7 +222,7 @@ function aliases:user() {
 			    printf '\tuser:name OLD_NAME NEW_NAME\n' > /dev/stderr
 			    exit 2
 			fi
-			
+
 			local old_name="\$1"; shift
 			local new_name="\$1" 
 
@@ -231,7 +231,7 @@ function aliases:user() {
 		} > /tmp/aliases_user_code &
 	fi
 	alias:script user:name=/tmp/aliases_user_code
-	
+
 	if [[ ! -x $DOTFILES_ALIASES/user:shell.sh ]]; then
 		{
 			cat <<-EOF
@@ -248,7 +248,7 @@ function aliases:user() {
 			    exit 0 
 			fi
 			local new_shell="\$1"
-			
+
 			sudo usermod -s "\$2" "\$1"
 			EOF
 		} > /tmp/aliases_user_code &
@@ -264,7 +264,7 @@ function aliases:user() {
 			    printf '\tuser:home [-m|--move-home] USER [NEW_HOME]\n' > /dev/stderr
 			    exit 2
 			fi
-			
+
 			local move_home=false
 			if [[ \$1 == -m || \$1 == --move-home ]]; then
 			    move_home=true; shift
@@ -300,8 +300,8 @@ function aliases:user() {
 			    groups "\$user"
 			    exit 0
 			fi
-			local groups=\$(tr -s ' ' ',' <<< "\$@") 
-			
+			local groups=\$(tr -s ' ' ',' <<< "\$@")
+
 			sudo usermod -aG "\$groups" "\$user"
 			EOF
 		} > /tmp/aliases_user_code &
@@ -310,7 +310,7 @@ function aliases:user() {
 }; aliases:user
 
 function aliases:group() {
-	alias:sudo $'group:list=awk -v FS=\':\' \'{ printf "%s ", $1; } END { print; }\' /etc/groups'
+	alias:sudo group:list=$'awk -v FS=\':\' \'NR == 1 { printf "%s", $1; } NR > 1 { printf " %s", $1; } END { printf "\\n"; }\' /etc/groups'
 	alias:sudo group:create=groupadd
 
 	if [[ ! -p /tmp/aliases_group_code ]]; then
@@ -368,12 +368,12 @@ function aliases:files() {
 	fi
 
 	if which git &> /dev/null; then
-		alias:configuration "git=$HOME/.gitconfig"
+		alias:configuration git="$HOME/.gitconfig"
 	fi
 }; aliases:files
 
 function aliases:devices() {
-	alias:sudo 'mount=mount -m'
+	alias:sudo mount='mount -m'
 	alias:sudo umount
 	alias:sudo fdisk
 	alias:sudo dd
@@ -395,13 +395,13 @@ function aliases:networking() {
 	fi
 
 	if which sshd &> /dev/null; then
-		alias:sudo 'ssh:reload=systemctl reload sshd'
+		alias:sudo ssh:reload='systemctl reload sshd'
 		alias:configuration ssh:daemon=/etc/ssh/sshd_config 'sudo systemctl reload sshd' 'Reloading Secure SHell Daemon...'
-		alias:configuration "ssh:client=$HOME/.ssh/config"
+		alias:configuration ssh:client="$HOME/.ssh/config"
 	fi
 
 	if which httpd &> /dev/null; then
-		alias:sudo 'apache:reload=systemctl reload httpd'
+		alias:sudo apache:reload='systemctl reload httpd'
 		alias:configuration apache=/etc/httpd/conf/httpd.conf 'sudo systemctl reload httpd' 'Reloading Apache...'
 		alias:configuration apache:virtualhosts=/etc/httpd/conf/extra/vhosts 'sudo systemctl reload httpd' 'Reloading Apache...'
 		# TODO: Implement using alias:script
@@ -412,8 +412,8 @@ function aliases:networking() {
 function aliases:system() {
 	alias:sudo pacman
 	alias:sudo systemctl
-	alias:sudo 'shutdown=systemctl poweroff'
-	alias:sudo 'reboot=systemctl reboot'
+	alias:sudo shutdown='systemctl poweroff'
+	alias:sudo reboot='systemctl reboot'
 	alias:configuration pacman=/etc/pacman.conf
 
 	if which paru &> /dev/null; then
@@ -421,13 +421,13 @@ function aliases:system() {
 	else
 		alias:sudo packages=pacman
 	fi
-	
+
 	if which grub-install &> /dev/null && which grub-mkconfig &> /dev/null; then
 		local grub_install_command="grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id=GRUB"
 		local grub_mkconfig_command='grub-mkconfig -o /boot/grub/grub.cfg'
-		alias "grub:reload=sudo $grub_install_command && sudo $grub_mkconfig_command"
-		alias:sudo "grub:install=$grub_install_command"
-		alias:sudo "grub:reconfigure=$grub_mkconfig_command"
+		alias grub:reload="sudo $grub_install_command && sudo $grub_mkconfig_command"
+		alias:sudo grub:install="$grub_install_command"
+		alias:sudo grub:reconfigure="$grub_mkconfig_command"
 		alias:configuration grub=/etc/default/grub "sudo $grub_install_command && sudo $grub_mkconfig_command" 'Reinstalling and reconfiguring GRUB...'
 		alias:configuration grub:entries=/etc/grub.d "sudo $grub_install_command && sudo $grub_mkconfig_command" 'Reinstalling and reconfiguring GRUB...'
 	fi
@@ -441,6 +441,7 @@ function aliases:system() {
 function aliases:programming() {
 	if which php &> /dev/null; then
 		alias:configuration php=/etc/php/php.ini
+		alias:configuration php:modules=/etc/php/conf.d
 	fi
 }; aliases:programming
 
@@ -449,17 +450,17 @@ function aliases:shell() {
 	if ! shopt -q login_shell; then
 		alias shell:type="printf 'interactive\\n'"
 		reload="source $HOME/.bashrc"
-		alias:configuration shell:interactive "$HOME/.bashrc" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
-		alias:configuration shell:login "$HOME/.profile" "$DOTFILES/commit.sh -a" '!ignore'
+		alias:configuration shell:interactive="$HOME/.bashrc" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
+		alias:configuration shell:login="$HOME/.profile" "$DOTFILES/commit.sh -a" '!ignore'
 	else
 		alias shell:type="printf 'login\\n'"
 		reload="source $HOME/.bashrc"
-		alias:configuration shell:interactive "$HOME/.bashrc" "$DOTFILES/commit.sh -a" '!ignore'
-		alias:configuration shell:login "$HOME/.profile" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
+		alias:configuration shell:interactive="$HOME/.bashrc" "$DOTFILES/commit.sh -a" '!ignore'
+		alias:configuration shell:login="$HOME/.profile" "$reload; $DOTFILES/commit.sh -a" 'Reloading shell...'
 	fi
 	alias shell:reload="$reload"
 
-	alias:configuration shell "$HOME/.shell" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
-	alias:configuration shell:integrations "$HOME/.integrations" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
-	alias:configuration shell:aliases "$HOME/.aliases" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell="$HOME/.shell" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:integrations="$HOME/.integrations" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:aliases="$HOME/.aliases" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
 }; aliases:shell

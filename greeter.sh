@@ -49,7 +49,7 @@ function main() {
 		exit 0
 	fi
 
-	local index selection session quick_action label
+	local selection session quick_action label
 
 	local full_username=$(awk -v FS=':' -v user="$USER" "$(cat <<- 'EOF'
 	{
@@ -126,7 +126,7 @@ function main() {
 		printf '\n'
 
 		printf 'Available Quick Actions:\n'
-		for selection in $(seq 1 $quick_action_count | awk '{ printf "%c\n", 96 + $1; }'); do
+		for selection in $(seq 1 $quick_action_count | awk '{ printf "%c\n", 96 + int($1); }'); do
 			label=${quick_action_labels[$selection]}
 			printf '\t%s. %s\n' "$selection" "$label"
 		done
