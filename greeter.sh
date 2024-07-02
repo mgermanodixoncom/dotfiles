@@ -38,6 +38,14 @@ function toggle_ssh_authentication() {
 	sudo systemctl reload sshd
 }
 
+function reboot_system() {
+	sudo systemctl reboot
+}
+
+function shutdown_system() {
+	sudo systemctl poweroff
+}
+
 function main() {
 	local dry_run=false
 	if [[ $1 == -d || $1 == --dry-run ]]; then
@@ -80,6 +88,8 @@ function main() {
 	local -A selection_to_quick_action
 	selection_to_quick_action[a]=fix_broken_wayland_session
 	selection_to_quick_action[b]=toggle_ssh_authentication
+	selection_to_quick_action[c]=reboot_system
+	selection_to_quick_action[d]=shutdown_system
 
 	local -A session_labels
 	session_labels[1]='KDE Plasma Desktop under X11'
@@ -90,6 +100,8 @@ function main() {
 	local -A quick_action_labels
 	quick_action_labels[a]='Fix Broken Wayland Session'
 	quick_action_labels[b]="Toggle SSH Authentication (currently using $current_ssh_authentication)"
+	quick_action_labels[c]='Reboot System'
+	quick_action_labels[d]='Shutdown System'
 	local -i quick_action_count=${#quick_action_labels[@]}
 
 	local session_variable="${USER^^}_SESSION"
