@@ -106,9 +106,9 @@ function main() {
 
 	local session_variable="${USER^^}_SESSION"
 	local default_session_variable="${USER^^}_DEFAULT_SESSION"
-	
+
 	local default_session=${!default_session_variable}
-	
+
 	local current_session
 	if ! $dry_run; then
 		current_session=${!session_variable}
@@ -211,3 +211,5 @@ function main() {
 }
 
 main "$@"
+
+unset fix_broken_wayland_session toggle_ssh_authentication reboot_system shutdown_system main

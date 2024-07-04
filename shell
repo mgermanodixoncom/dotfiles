@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+##
+## General Configuration
+##
+
+shopt -s extglob
+
+export DOTFILES="$HOME/.dotfiles"
+export DOTFILES_SCRIPTS="$DOTFILES/scripts"
+export DOTFILES_ALIAS_SCRIPTS="$DOTFILES_SCRIPTS/alias"
+export DOTFILES_TEMPORARY="/tmp/dotfiles/$USER"
+export EDITOR=nano
+export SUDO_EDITOR=rnano
+
+##
+## Prompt
+##
+
+export PS1="\u@\h:\W\$ "
+
+##
+## Integrations
+##
+
+source "$DOTFILES/integrations"
+
+##
+## Aliases
+##
+
+source "$DOTFILES/aliases"

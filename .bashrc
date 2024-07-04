@@ -5,20 +5,13 @@
 #######################################
 
 ##
-## Greeter
-##
-
-source "$HOME/.dotfiles/greeter.sh"
-
-##
 ## Dotfiles Bootstrapping
 ##
 
-source "$HOME/.dotfiles/bootstrap.sh"
+source "$HOME/.dotfiles/scripts/bootstrap.sh"
 
 ##
 ## Common Configuration
 ##
 
-source "$HOME/.shell"
-
+source "$HOME/.dotfiles/shell"
