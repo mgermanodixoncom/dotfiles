@@ -431,7 +431,7 @@ function aliases:networking() {
 
 function aliases:system() {
 	alias:sudo pacman
-	alias:sudo systemctl
+	alias:sudo -b systemctl
 	alias:sudo shutdown='systemctl poweroff'
 	alias:sudo reboot='systemctl reboot'
 	alias:configuration pacman=/etc/pacman.conf
