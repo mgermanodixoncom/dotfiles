@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 function main() {
+	if [[ -n $SSH_CLIENT || -n $SUDO_USER ]]; then
+		exit 0
+	fi
+
 	local session_variable="${USER^^}_SESSION"
 	local current_session=${!session_variable}
 
@@ -12,4 +16,4 @@ function main() {
 
 main "$@"
 
-unset fix_broken_wayland_session toggle_ssh_authentication reboot_system shutdown_system main
+unset main
