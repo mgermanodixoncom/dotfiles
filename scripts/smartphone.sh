@@ -2,7 +2,7 @@
 
 function main() {
 	if [[ -n $SSH_CLIENT || -n $SUDO_USER ]]; then
-		exit 0
+		return 0
 	fi
 
 	local session_variable="${USER^^}_SESSION"
