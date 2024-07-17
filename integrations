@@ -17,7 +17,7 @@ fi
 
 if which go &> /dev/null; then
     export PATH="$PATH:$GOPATH/bin"
-    export GOPATH="$HOME/Programming/Go"
+    export GOPATH="$HOME/Development/Go"
 fi
 
 if which composer &> /dev/null; then
@@ -45,5 +45,5 @@ if which wine &> /dev/null; then
 fi
 
 if which tic80 &> /dev/null; then
-	export TIC80_START_PATH="$HOME/Programming/TIC-80"
+	export TIC80_START_PATH="$HOME/Development/TIC-80"
 fi

@@ -480,7 +480,7 @@ function aliases:shell() {
 	fi
 	alias shell:reload="$reload"
 
-	alias:configuration shell="$HOME/.shell" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
-	alias:configuration shell:integrations="$HOME/.integrations" "$reload; $DOTFILES_SCRIPTS/commit.sh -a" "Reloading shell..."
-	alias:configuration shell:aliases="$HOME/.aliases" "$reload; $DOTFILES_SCRIPTS/commit.sh -a" "Reloading shell..."
+	alias:configuration shell="$DOTFILES/shell" "$reload; $DOTFILES/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:integrations="$DOTFILES/integrations" "$reload; $DOTFILES_SCRIPTS/commit.sh -a" "Reloading shell..."
+	alias:configuration shell:aliases="$DOTFILES/aliases" "$reload; $DOTFILES_SCRIPTS/commit.sh -a" "Reloading shell..."
 }; aliases:shell
