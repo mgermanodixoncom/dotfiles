@@ -172,9 +172,9 @@ function alias:configuration() {
 				printf '%s "$file"\n' "$editor"
 			elif [[ -z $reload_message ]]; then
 				cat <<-EOF
-				local prechecksum=\$(cksum --ignore-missing "\$file")
+				local prechecksum=\$(cksum "\$file" 2> /dev/null)
 				$editor "\$file"
-				local postchecksum=\$(cksum --ignore-missing "\$file")
+				local postchecksum=\$(cksum "\$file" 2> /dev/null)
 				if [[ "\$prechecksum" != "\$postchecksum" ]]; then
 				    printf 'Reloading $program...\n'
 				EOF
@@ -182,18 +182,18 @@ function alias:configuration() {
 				printf 'fi\n'
 			elif [[ $reload_message == '!ignore' ]]; then
 				cat <<-EOF
-				local prechecksum=\$(cksum --ignore-missing "\$file")
+				local prechecksum=\$(cksum "\$file" 2> /dev/null)
 				$editor "\$file"
-				local postchecksum=\$(cksum --ignore-missing "\$file")
+				local postchecksum=\$(cksum "\$file" 2> /dev/null)
 				if [[ "\$prechecksum" != "\$postchecksum" ]]; then
 				EOF
 				awk -v RS='[[:space:]]*;[[:space:]]*' '{ printf "\n    %s", $0; }' <<< "$reload_command"
 				printf 'fi\n'
 			else
 				cat <<-EOF
-				local prechecksum=\$(cksum --ignore-missing "\$file")
+				local prechecksum=\$(cksum "\$file" 2> /dev/null)
 				$editor "\$file"
-				local postchecksum=\$(cksum --ignore-missing "\$file")
+				local postchecksum=\$(cksum "\$file" 2> /dev/null)
 				if [[ "\$prechecksum" != "\$postchecksum" ]]; then
 				    printf '$reload_message\n'
 				EOF
