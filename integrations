@@ -23,6 +23,8 @@ fi
 if which composer &> /dev/null; then
 	function integrate:composer() {
 		export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+		export COMPOSER_ALLOW_XDEBUG=1
+		export COMPOSER_DISABLE_XDEBUG_WARN=1
 	}; integrate:composer
 fi
 
